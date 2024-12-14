@@ -111,7 +111,7 @@ def change_appointment(appointments):
         print(f"Current Appointment: {appt}")
         name = input("Enter new client name: ")
         phone = input("Enter new client phone: ")
-        appt_type = int(input("Enter new appointment type (1: Mens Cut, 2: Ladies Cut, etc.): "))
+        appt_type = int(input("Enter new appointment type (1: Mens Cut, 2: Ladies Cut, 3: Mens Colouring 4: Ladies Colouring): "))
         appt.schedule(name, phone, appt_type)
         print("Appointment updated successfully!")
     else:
@@ -119,7 +119,7 @@ def change_appointment(appointments):
 
 def calculate_total_fees_for_day(appointments, day):
     day = day.capitalize()
-    fees = {1: 25, 2: 40, 3: 50, 4: 75}  # Example fee structure
+    fees = {1: 40, 2: 60, 3: 40, 4: 80}  
     total = 0
     for appt in appointments:
         if appt.day_of_week == day and appt.appt_type in fees:
@@ -127,7 +127,7 @@ def calculate_total_fees_for_day(appointments, day):
     print(f"Total fees for {day}: ${total:.2f}")
 
 def calculate_total_weekly_fees(appointments):
-    fees = {1: 25, 2: 40, 3: 50, 4: 75}  # Example fee structure
+    fees = {1: 40, 2: 60, 3: 40, 4: 80}
     total = 0
     for appt in appointments:
         if appt.appt_type in fees:
@@ -141,7 +141,7 @@ def schedule_appointment(appointments):
     if appt and appt.get_appt_type() == 0:
         name = input("Enter client name: ")
         phone = input("Enter client phone: ")
-        appt_type = int(input("Enter appointment type (1: Mens Cut, 2: Ladies Cut, etc.): "))
+        appt_type = int(input("Enter appointment type (1: Mens Cut, 2: Ladies Cut, 3: Mens Colouring 4: Ladies Colouring): "))
         appt.schedule(name, phone, appt_type)
         print("Appointment scheduled successfully!")
     else:
@@ -156,6 +156,12 @@ def cancel_appointment(appointments):
         print("Appointment canceled.")
     else:
         print("No appointment found.")
+
+def save_appointments_to_file(appointments, filename="appointments.txt"):
+    with open(filename, 'w') as file:
+        for appt in appointments:
+            if appt.get_appt_type() != 0:
+                file.write(appt.format_record() + '\n')
 
 def print_menu():
     print("====================================")
@@ -196,7 +202,11 @@ def main():
         elif choice == 7:
             calculate_total_weekly_fees(appointments)
         elif choice == 9:
-            print("** Exiting system **")
+            save = input("Do you want to save all scheduled appointments to a file (Y/N)? ")
+            if save.lower() == 'y':
+                save_appointments_to_file(appointments)
+                print("Appointments saved successfully!")
+            print("Good Bye!")
             break
         else:
             print("Invalid option.")
