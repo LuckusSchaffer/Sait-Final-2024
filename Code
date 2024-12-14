@@ -1,0 +1,205 @@
+import os    
+
+class Appointment:
+    def __init__(self, day_of_week, start_time_hour):
+        self.client_name = ""
+        self.client_phone = ""
+        self.appt_type = 0
+        self.day_of_week = day_of_week
+        self.start_time_hour = start_time_hour
+
+    # Getters
+    def get_client_name(self):
+        return self.client_name
+
+    def get_client_phone(self):
+        return self.client_phone
+
+    def get_appt_type(self):
+        return self.appt_type
+
+    def get_day_of_week(self):
+        return self.day_of_week
+
+    def get_start_time_hour(self):
+        return self.start_time_hour
+
+    def get_appt_type_desc(self):
+        types = {
+            0: "Available",
+            1: "Mens Cut",
+            2: "Ladies Cut",
+            3: "Mens Colouring",
+            4: "Ladies Colouring"
+        }
+        return types.get(self.appt_type, "Unknown")
+
+    def get_end_time_hour(self):
+        return self.start_time_hour + 1
+
+    # Setters
+    def set_client_name(self, name):
+        self.client_name = name
+
+    def set_client_phone(self, phone):
+        self.client_phone = phone
+
+    def set_appt_type(self, appt_type):
+        self.appt_type = appt_type
+
+    # Schedule appointment
+    def schedule(self, name, phone, appt_type):
+        self.client_name = name
+        self.client_phone = phone
+        self.appt_type = appt_type
+
+    # Cancel appointment
+    def cancel(self):
+        self.client_name = ""
+        self.client_phone = ""
+        self.appt_type = 0
+
+    # String representations
+    def format_record(self):
+        return f"{self.client_name},{self.client_phone},{self.appt_type},{self.day_of_week},{self.start_time_hour:02d}"
+
+    def __str__(self):
+        return (f"{self.client_name:15} {self.client_phone:15} {self.day_of_week:10} "
+                f"{self.start_time_hour:02d}:00 - {self.get_end_time_hour():02d}:00 {self.get_appt_type_desc()}")
+
+def create_weekly_calendar(appointments):
+    appointments.clear()
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    for day in days:
+        for hour in range(9, 17):  # 9 AM to 4 PM
+            appointments.append(Appointment(day, hour))
+
+def find_appointment_by_time(appointments, day, hour):
+    for appt in appointments:
+        if appt.day_of_week == day and appt.start_time_hour == hour:
+            return appt
+    return None
+
+def show_appointments_by_day(appointments, day):
+    print(f"\nAppointments for {day}:")
+    for appt in appointments:
+        if appt.day_of_week == day:
+            print(appt)
+
+def find_appointment_by_name(appointments, name):
+    found = False
+    print(f"\nAppointments for {name}:")
+    for appt in appointments:
+        if appt.client_name.lower() == name.lower():
+            print(appt)
+            found = True
+    if not found:
+        print("No appointments found for this client.")
+
+def print_calendar_for_day(appointments, day):
+    day = day.capitalize()
+    print(f"\nCalendar for {day}:")
+    for appt in appointments:
+        if appt.day_of_week == day:
+            print(appt)
+
+def change_appointment(appointments):
+    day = input("Enter current appointment day (Monday-Saturday): ").capitalize()
+    hour = int(input("Enter current appointment hour (9-16): "))
+    appt = find_appointment_by_time(appointments, day, hour)
+    if appt and appt.appt_type != 0:
+        print(f"Current Appointment: {appt}")
+        name = input("Enter new client name: ")
+        phone = input("Enter new client phone: ")
+        appt_type = int(input("Enter new appointment type (1: Mens Cut, 2: Ladies Cut, etc.): "))
+        appt.schedule(name, phone, appt_type)
+        print("Appointment updated successfully!")
+    else:
+        print("No appointment found at this time slot.")
+
+def calculate_total_fees_for_day(appointments, day):
+    day = day.capitalize()
+    fees = {1: 25, 2: 40, 3: 50, 4: 75}  # Example fee structure
+    total = 0
+    for appt in appointments:
+        if appt.day_of_week == day and appt.appt_type in fees:
+            total += fees[appt.appt_type]
+    print(f"Total fees for {day}: ${total:.2f}")
+
+def calculate_total_weekly_fees(appointments):
+    fees = {1: 25, 2: 40, 3: 50, 4: 75}  # Example fee structure
+    total = 0
+    for appt in appointments:
+        if appt.appt_type in fees:
+            total += fees[appt.appt_type]
+    print(f"Total fees for the week: ${total:.2f}")
+
+def schedule_appointment(appointments):
+    day = input("Enter day (Monday-Saturday): ").capitalize()
+    hour = int(input("Enter start hour (9-16): "))
+    appt = find_appointment_by_time(appointments, day, hour)
+    if appt and appt.get_appt_type() == 0:
+        name = input("Enter client name: ")
+        phone = input("Enter client phone: ")
+        appt_type = int(input("Enter appointment type (1: Mens Cut, 2: Ladies Cut, etc.): "))
+        appt.schedule(name, phone, appt_type)
+        print("Appointment scheduled successfully!")
+    else:
+        print("Time slot unavailable.")
+
+def cancel_appointment(appointments):
+    day = input("Enter day (Monday-Saturday): ").capitalize()
+    hour = int(input("Enter start hour (9-16): "))
+    appt = find_appointment_by_time(appointments, day, hour)
+    if appt and appt.appt_type != 0:
+        appt.cancel()
+        print("Appointment canceled.")
+    else:
+        print("No appointment found.")
+
+def print_menu():
+    print("====================================")
+    print("\nHair Salon Appointment Manager:")
+    print(" ")
+    print("====================================")
+    print("1. Schedule an appointment")
+    print("2. Find appointment by name")
+    print("3. Print calendar for a specific day")
+    print("4. Cancel appointment")
+    print("5. Change an appointment")
+    print("6. Calculate total fees for a day")
+    print("7. Calculate total weekly fees")
+    print("9. Exit")
+    return int(input("Choose an option: "))
+
+def main():
+    appointments = []
+    create_weekly_calendar(appointments)
+
+    while True:
+        choice = print_menu()
+        if choice == 1:
+            schedule_appointment(appointments)
+        elif choice == 2:
+            name = input("Enter client name to search: ")
+            find_appointment_by_name(appointments, name)
+        elif choice == 3:
+            day = input("Enter day (Monday-Saturday): ").capitalize()
+            print_calendar_for_day(appointments, day)
+        elif choice == 4:
+            cancel_appointment(appointments)
+        elif choice == 5:
+            change_appointment(appointments)
+        elif choice == 6:
+            day = input("Enter day (Monday-Saturday): ").capitalize()
+            calculate_total_fees_for_day(appointments, day)
+        elif choice == 7:
+            calculate_total_weekly_fees(appointments)
+        elif choice == 9:
+            print("** Exiting system **")
+            break
+        else:
+            print("Invalid option.")
+
+if __name__ == "__main__":
+    main()
